@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: bank-fee-auditor
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: bash ./render-build.sh
+    startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: bank-fee-auditor-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: MOCK_BANK_API_KEY
+        generateValue: true
+
+databases:
+  - name: bank-fee-auditor-db
+    region: oregon
+    plan: free
+    databaseName: bank_fee_auditor
+    user: auditor_admin
